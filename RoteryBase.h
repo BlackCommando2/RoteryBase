@@ -1,27 +1,29 @@
+#include <Arduino_JSON.h>
 #include <Wire.h>
 #include <PID_v1.h>
 #include <Motor.h>
 #include <MPU6050_tockn.h>
 #include "States/States.cpp"
+#include "mpu/mpu.cpp"
 #include "optimizer/optimizer.cpp"
 #include "virtualBase/virtualBase.cpp"
-#include "./Commander/Commander.cpp"
 #include "odometry/odometry.cpp"
 #include "encoderFeedback/encoderFeedback.h"
-#include "mpu/mpu.cpp"
 #include "MotorHandler/MotorHandler.cpp"
 #include "feedbackHandler/feedbackHandler.cpp"
-#include "PIDDirections/PIDDirections.cpp"
 #include "PIDRatio/PIDRatio.cpp"
+#include "Arduino.h"
+
 // translateXY *translate;
 class RoteryBase
 {
 public:
-    Direction *real = new Direction();
-    Direction *PID_out = new Direction();
-    Direction *UserIn = new Direction();
-    MotorSpeeds *finalSpeeds = new MotorSpeeds();
-    encoderFeedback *efx = new encoderFeedback();
+    Direction *real = new Direction(); //encoder (fx&fy),mpu(fr) real-time reading
+    Direction *PID_out = new Direction(); // pid output
+    Direction *UserIn = new Direction(); // remote values
+    Direction *smartBaseUserIn = new Direction();
+    MotorSpeeds *finalSpeeds = new MotorSpeeds(); // final pwm set for motors
+    encoderFeedback *efx = new encoderFeedback(); 
     encoderFeedback *efy = new encoderFeedback();
     encoderFeedback *efr = new encoderFeedback();
     Motor *m1, *m2, *m3, *m4;
@@ -35,8 +37,11 @@ public:
         if (!virtualMode)
         {
             feedback.setup();
-            mpu.setOffset(-1);
+            mpu.setOffset(1); // check thissssssssssssssssssssssssssssss
             feedback.setDirections(real);
+            // smartBase.disableAutoMode(); // new
+            // smartBase.setRealDirection(real);
+            // smartBase.setUserInDirections(smartBaseUserIn,UserIn);
             PID_ratio.set(real, PID_out, UserIn);
             PID_ratio.setup();
             OdometryHelper.setDirections(PID_out);
@@ -45,7 +50,6 @@ public:
         }
         else
         {
-            
             vbase.set(PID_out, real);
             PID_ratio.set(real, PID_out, UserIn);
             PID_ratio.setup();
@@ -60,8 +64,18 @@ public:
             else
                 vbase.feedbackCompute();
 
+            // if(!smartBase.autoBase)
+            // {
+            //     // Serial.println("manual");
+            //     smartBase.compute();
+            // }
+            // else if(smartBase.autoBase)
+            // {
+            //     //Serial.println("auto");
+            //     smartBase.autoCompute();
+            // }
+            
             PID_ratio.compute();
-
             if (!virtualMode)
             {
                 OdometryHelper.compute();
@@ -92,7 +106,7 @@ public:
     }
     void setDirection(Direction *_UserIn)
     {
-        UserIn = _UserIn;
+        smartBaseUserIn = _UserIn;
         setup();
     }
     void enableVirtualMode(bool _virtualMode = true)
@@ -112,6 +126,11 @@ public:
     {
         return UserIn;
     }
+    Direction *smartBaseUserInRef()
+    {
+        return smartBaseUserIn;
+    }
+
     MotorSpeeds *getFinalSpeedsRef()
     {
         return finalSpeeds;

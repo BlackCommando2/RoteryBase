@@ -15,10 +15,10 @@ public:
     optimizer *opt = new optimizer();
     double dist = 0, brakeOut = 0, zero = 0;
     bool braking = false;
-    double xKp = 1, xKi = 0, xKd = 0;
-    double yKp = 1, yKi = 0, yKd = 0;
-    double rKp = 1.5, rKi = 0, rKd = 0;
-    double brakeKp = 5, brakeKi = 0.1, brakeKd = 0;
+    double xKp = 1.0, xKi = 0, xKd = 0;
+    double yKp = 1.0, yKi = 0, yKd = 0;
+    double rKp = 3.0, rKi = 0, rKd = 0;//3.0
+    double brakeKp = 4.0, brakeKi = 0.1, brakeKd = 0;
     PID *fxPID, *fyPID, *frPID, *brake;
 
     PIDRatio() {}
@@ -58,9 +58,11 @@ public:
     }
     void compute()
     {
-       
+            // UserIn->display();
             UserIn->process();
-            if (UserIn->isZero && !prevUserIn->isZero)
+
+            // Braking Logic
+            if (UserIn->isZero && !prevUserIn->isZero)// Detecting Brake
             {
                 prevUserIn->magnitude = 1;
                 prevUserIn->invertProcess();
@@ -69,11 +71,16 @@ public:
             }
             else
             {
-                *currUserIn = *UserIn;
-                braking = false;
+                //Reducing User Input
+                currUserIn->fx = UserIn->fx / 1;
+                currUserIn->fy = UserIn->fy / 1;
+                currUserIn->fr = UserIn->fr / 1;
+                braking = false;  
             }
             *prevUserIn = *currUserIn;
-            *t_feedback = *_feedback / 8;
+
+
+            *t_feedback = *_feedback / 8; // test this
             *currentFeedback = *t_feedback - *prevFeedback;
             *speedReferenceFeedback = *currentFeedback;
             currUserIn->process();
@@ -82,14 +89,15 @@ public:
                 opt->minimize();
             }
             currUserIn->process();
-            *traveled = *speedReferenceFeedback - *currentFeedback;
-            traveled->process();
-            dist = pow(pow((speedReferenceFeedback->fx - currentFeedback->fx), 2) +
-                 pow((speedReferenceFeedback->fy - currentFeedback->fy), 2) +
-                 pow((speedReferenceFeedback->fr - currentFeedback->fr), 2), 0.5) * 10;
+            
             *prevFeedback=*t_feedback - *currentFeedback;
             if(braking){
+                *traveled = *speedReferenceFeedback - *currentFeedback;
+                dist = pow(pow((speedReferenceFeedback->fx - currentFeedback->fx), 2) +
+                    pow((speedReferenceFeedback->fy - currentFeedback->fy), 2) +
+                    pow((speedReferenceFeedback->fr - currentFeedback->fr), 2), 0.5) * 2;// * 2
                 brake->Compute();
+                traveled->process();
                 traveled->magnitude = brakeOut;
                 traveled->invertProcess();
                 *currUserIn = *traveled;

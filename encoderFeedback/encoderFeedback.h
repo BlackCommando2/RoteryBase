@@ -17,7 +17,7 @@ class encoderFeedback{
         
         keepHistory = history;
         setEncoder(e);
-        prevTime = micros();
+        prevTime = micros(); // not needed as never used
     }
     void setEncoder(UniversalEncoder *e){
         enc = e;

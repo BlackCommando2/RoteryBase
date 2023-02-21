@@ -24,7 +24,10 @@ class Direction{
     double fx = 0, fy = 0, fr = 0;
     bool isZero = false;
 
-    void display(){
+    void display()
+    {
+        // Serial.println(fx);
+        // Serial.println(String(fx)+","+String(fy)+","+String(fr));
         Serial.println("fx: "+String(fx)+"\tfy: "+String(fy)+"\tfr: "+String(fr));
     }
     void displayRatio(){
@@ -166,5 +169,17 @@ class Direction{
     }
     operator String(){
         return "fx="+String(fx)+" fy="+String(fy)+" fr="+String(fr);
+    }
+    void parseJson(JSONVar msg)
+    {
+        fx=msg["fx"];
+        fy=msg["fy"];
+        fr=msg["fr"];
+        // display();
+        // Serial.println("parse: "+String(msg["fx"]));
+        // rfx=msg["rfx"];
+        // rfy=msg["rfy"];
+        // rfr=msg["rfr"];
+        // magnitude=msg["magnitude"];
     }
 };
