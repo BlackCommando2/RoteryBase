@@ -15,10 +15,10 @@ public:
     optimizer *opt = new optimizer();
     double dist = 0, brakeOut = 0, zero = 0;
     bool braking = false;
-    double xKp = 1.0, xKi = 0, xKd = 0;
-    double yKp = 1.0, yKi = 0, yKd = 0;
+    double xKp = 4.0, xKi = 0, xKd = 0;
+    double yKp = 4.0, yKi = 0, yKd = 0;
     double rKp = 3.0, rKi = 0, rKd = 0;//3.0
-    double brakeKp = 4.0, brakeKi = 0.1, brakeKd = 0;
+    double brakeKp = 4.0, brakeKi = 0.1, brakeKd = 0;//4
     PID *fxPID, *fyPID, *frPID, *brake;
 
     PIDRatio() {}

@@ -14,15 +14,13 @@
 #include "PIDRatio/PIDRatio.cpp"
 #include "Arduino.h"
 
-// translateXY *translate;
 class RoteryBase
 {
 public:
-    Direction *real = new Direction(); //encoder (fx&fy),mpu(fr) real-time reading
-    Direction *PID_out = new Direction(); // pid output
-    Direction *UserIn = new Direction(); // remote values
-    Direction *smartBaseUserIn = new Direction();
-    MotorSpeeds *finalSpeeds = new MotorSpeeds(); // final pwm set for motors
+    Direction *real = new Direction(); 
+    Direction *PID_out = new Direction();
+    Direction *UserIn = new Direction();
+    MotorSpeeds *finalSpeeds = new MotorSpeeds();
     encoderFeedback *efx = new encoderFeedback(); 
     encoderFeedback *efy = new encoderFeedback();
     encoderFeedback *efr = new encoderFeedback();
@@ -37,11 +35,8 @@ public:
         if (!virtualMode)
         {
             feedback.setup();
-            mpu.setOffset(1); // check thissssssssssssssssssssssssssssss
+            mpu.setOffset(-1);
             feedback.setDirections(real);
-            // smartBase.disableAutoMode(); // new
-            // smartBase.setRealDirection(real);
-            // smartBase.setUserInDirections(smartBaseUserIn,UserIn);
             PID_ratio.set(real, PID_out, UserIn);
             PID_ratio.setup();
             OdometryHelper.setDirections(PID_out);
@@ -64,17 +59,6 @@ public:
             else
                 vbase.feedbackCompute();
 
-            // if(!smartBase.autoBase)
-            // {
-            //     // Serial.println("manual");
-            //     smartBase.compute();
-            // }
-            // else if(smartBase.autoBase)
-            // {
-            //     //Serial.println("auto");
-            //     smartBase.autoCompute();
-            // }
-            
             PID_ratio.compute();
             if (!virtualMode)
             {
@@ -86,7 +70,7 @@ public:
             prevtime = micros();
         }
     }
-    void setMotors(Motor *_m1, Motor *_m2, Motor *_m3, Motor *_m4) //setting all the motors
+    void setMotors(Motor *_m1, Motor *_m2, Motor *_m3, Motor *_m4)
     {
         virtualMode = false;
         m1 = _m1;
@@ -106,7 +90,7 @@ public:
     }
     void setDirection(Direction *_UserIn)
     {
-        smartBaseUserIn = _UserIn;
+        UserIn = _UserIn;
         setup();
     }
     void enableVirtualMode(bool _virtualMode = true)
@@ -125,10 +109,6 @@ public:
     Direction *getUserInRef()
     {
         return UserIn;
-    }
-    Direction *smartBaseUserInRef()
-    {
-        return smartBaseUserIn;
     }
 
     MotorSpeeds *getFinalSpeedsRef()
