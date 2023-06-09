@@ -99,13 +99,25 @@ public:
     Direction *directions = new Direction();
     MotorSpeeds *ms = new MotorSpeeds();
     //2,3,1 && 3,2,1
-    double m3_x = (e * i - f * h) / det;
-    double m3_y = (h * c - i * b) / det;
-    double m3_r = (b * f - c * e) / det;
+    // double m3_x = (e * i - f * h) / det;
+    // double m3_y = (h * c - i * b) / det;
+    // double m3_r = (b * f - c * e) / det;
 
-    double m2_x = (g * f - d * i) / det;
-    double m2_y = (a * i - g * c) / det;
-    double m2_r = (d * c - a * f) / det;
+    // double m2_x = (g * f - d * i) / det;
+    // double m2_y = (a * i - g * c) / det;
+    // double m2_r = (d * c - a * f) / det;
+
+    // double m1_x = (d * h - g * e) / det;
+    // double m1_y = (g * b - a * h) / det;
+    // double m1_r = (a * e - d * b) / det;
+    
+    double m2_x = (e * i - f * h) / det;
+    double m2_y = (h * c - i * b) / det;
+    double m2_r = (b * f - c * e) / det;
+
+    double m3_x = (g * f - d * i) / det;
+    double m3_y = (a * i - g * c) / det;
+    double m3_r = (d * c - a * f) / det;
 
     double m1_x = (d * h - g * e) / det;
     double m1_y = (g * b - a * h) / det;
@@ -138,14 +150,25 @@ public:
     void compute()
     {
         // directions->display();
-        ms->m1 = (m1_x * -1 * directions->fx + m1_y * directions->fy + m1_r * directions->fr);
+        ms->m1 = (m1_x * -1 * directions->fx + m1_y * -1 * directions->fy + m1_r * -1 * directions->fr);
         max = abs(ms->m1);
 
-        ms->m2 = (m2_x * -1 * directions->fx + m2_y * directions->fy + m2_r * directions->fr);
+        ms->m2 = (m2_x * -1 * directions->fx + m2_y * -1 * directions->fy + m2_r * -1 * directions->fr);
         manageMax(ms->m2);
 
-        ms->m3 = (m3_x * -1 * directions->fx + m3_y * directions->fy + m3_r * directions->fr);
+        ms->m3 = (m3_x * -1 * directions->fx + m3_y * -1 * directions->fy + m3_r * -1 * directions->fr);
         manageMax(ms->m3);
+
+        // ms->m1 = (m1_x * directions->fx + m1_y * directions->fy + m1_r * directions->fr);
+        // max = abs(ms->m1);
+
+        // ms->m2 = (m2_x * directions->fx + m2_y * directions->fy + m2_r  * directions->fr);
+        // manageMax(ms->m2);
+
+        // ms->m3 = (m3_x * directions->fx + m3_y * directions->fy + m3_r * directions->fr);
+        // manageMax(ms->m3);
+
+
 
         // Serial.println("max: "+String(max));
         if (max > 255)
